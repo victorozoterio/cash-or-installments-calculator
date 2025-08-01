@@ -1,0 +1,144 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font: var(--text-md);
+  color: var(--text-color-primary);
+  background-color: var(--bg-color);
+}
+
+.simulator {
+  border: none;
+  padding: 2rem 2.5rem;
+  background: var(--bg-simulator-color);
+  border-radius: 1rem;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.08);
+
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2rem;
+
+  max-width: 30rem;
+  margin: 5vh auto;
+}
+
+.simulator h1 {
+  font: var(--text-lg);
+  text-align: center;
+  margin-bottom: 0.5rem;
+}
+
+.container {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  width: 100%;
+}
+
+.row {
+  display: grid;
+  grid-template-columns: 1fr 8rem;
+  gap: 2rem;
+}
+
+.input-wrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.input-box {
+  display: flex;
+  align-items: center;
+  border: 2px solid var(--border-color);
+  border-radius: 0.5rem;
+  overflow: hidden;
+  background: var(--bg-simulator-color);
+  transition: border-color 0.2s;
+}
+
+.input-box:hover {
+  border-color: var(--border-color-hover);
+}
+
+.input-box:focus-within {
+  border-color: var(--border-color-focus);
+}
+
+.prefix,
+.suffix {
+  background: var(--bg-prefix-color);
+  color: var(--text-color-primary);
+  font-size: 0.9rem;
+  padding: 0 0.75rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+}
+
+.prefix {
+  border-right: 1px solid var(--border-color);
+}
+
+.suffix {
+  border-left: 1px solid var(--border-color);
+}
+
+.input-box input {
+  flex: 1;
+  border: none;
+  padding: 0.75rem 0.75rem;
+  font-size: 1rem;
+  outline: none;
+  background: transparent;
+}
+
+.input-box input::placeholder {
+  color: var(--placeholder-color);
+}
+
+button {
+  padding: 1rem;
+  background-color: var(--btn-color);
+  color: var(--bg-simulator-color);
+  border-radius: 0.5rem;
+  border: none;
+  cursor: pointer;
+  font-weight: 600;
+  font-size: 1.1rem;
+  width: 100%;
+  transition: 0.2s;
+}
+
+button:hover {
+  background-color: var(--btn-color-hover);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.result-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  margin-top: 1.5rem;
+  gap: 0.5rem;
+}
+
+.result-container strong {
+  font-weight: 700;
+  font-size: 1.1rem;
+}
+
+.note-container {
+  font-size: 0.75rem;
+  color: #555555;
+  margin-top: 0.5rem;
+  line-height: 1.4;
+  max-width: 36rem;
+}

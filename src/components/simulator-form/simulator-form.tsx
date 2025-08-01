@@ -1,3 +1,4 @@
+import styles from './simulator-form.module.css';
 import React, { useEffect, useState } from 'react';
 import { getAnnualSelicRatePercent, getSimulatorResult } from '../../services';
 import * as T from '../../services/simulator/types';
@@ -42,80 +43,87 @@ export default function SimulatorForm() {
   return (
     <main>
       <form onSubmit={handleSubmit}>
-        <fieldset className='simulator'>
-          <legend>À vista ou parcelado?</legend>
+        <fieldset className={styles.simulator}>
+          <h1>À vista ou parcelado?</h1>
 
-          <div className='container grid'>
-            <div className='input-wrapper'>
-              <label htmlFor='installment-value'>Valor da parcela</label>
-              <input
-                type='number'
-                id='installment-value'
-                value={installmentValue}
-                onChange={(e) => setInstallmentValue(Number(e.target.value))}
-                placeholder='00,00'
-                required
-              />
+          <div className={styles.container}>
+            <div className={styles.row}>
+              <div className={styles['input-wrapper']}>
+                <label htmlFor='installment-value'>Valor da parcela</label>
+                <div className={styles['input-box']}>
+                  <div className={styles.prefix}>R$</div>
+                  <input
+                    type='number'
+                    id='installment-value'
+                    value={installmentValue}
+                    onChange={(e) => setInstallmentValue(Number(e.target.value))}
+                    placeholder='00,00'
+                    required
+                  />
+                </div>
+              </div>
+
+              <div className={styles['input-wrapper']}>
+                <label htmlFor='number-of-installments'>Quant. de parcelas</label>
+                <div className={styles['input-box']}>
+                  <input
+                    type='number'
+                    id='number-of-installments'
+                    value={numberOfInstallments}
+                    onChange={(e) => setNumberOfInstallments(Number(e.target.value))}
+                    placeholder='0'
+                    required
+                  />
+                </div>
+              </div>
             </div>
 
-            <div className='input-wrapper'>
-              <label htmlFor='number-of-installments'>Quant. de parcelas</label>
-              <input
-                type='number'
-                id='number-of-installments'
-                value={numberOfInstallments}
-                onChange={(e) => setNumberOfInstallments(Number(e.target.value))}
-                placeholder='0'
-                required
-              />
-            </div>
+            <div className={styles.row}>
+              <div className={styles['input-wrapper']}>
+                <label htmlFor='cash-value'>Valor à vista</label>
+                <div className={styles['input-box']}>
+                  <div className={styles.prefix}>R$</div>
+                  <input
+                    type='number'
+                    id='cash-value'
+                    value={cashValue}
+                    onChange={(e) => setCashValue(Number(e.target.value))}
+                    placeholder='00,00'
+                    required
+                  />
+                </div>
+              </div>
 
-            <div className='input-wrapper'>
-              <label htmlFor='cash-value'>Valor à vista</label>
-              <input
-                type='number'
-                id='cash-value'
-                value={cashValue}
-                onChange={(e) => setCashValue(Number(e.target.value))}
-                placeholder='00,00'
-                required
-              />
-            </div>
-
-            <div className='input-wrapper'>
-              <label htmlFor='annual-selic-rate'>Taxa de juros anual</label>
-              <input
-                type='number'
-                id='annual-selic-rate'
-                value={annualSelicRatePercent}
-                onChange={(e) => setAnnualSelicRatePercent(e.target.value)}
-                placeholder='00,00'
-                required
-              />
+              <div className={styles['input-wrapper']}>
+                <label htmlFor='annual-selic-rate'>Taxa de juros anual</label>
+                <div className={styles['input-box']}>
+                  <input
+                    type='number'
+                    id='annual-selic-rate'
+                    value={annualSelicRatePercent}
+                    onChange={(e) => setAnnualSelicRatePercent(e.target.value)}
+                    placeholder='0'
+                    required
+                  />
+                  <div className={styles.suffix}>%</div>
+                </div>
+              </div>
             </div>
 
             <button type='submit'>Simular</button>
 
-            {resultData && (
-              <>
-                <div id='result-container' style={{ display: 'block' }}>
-                  {resultData.result}
-                </div>
-                <div id='cash-option-container' style={{ display: 'block' }}>
-                  {resultData.cashOption}
-                </div>
-                <div id='installment-option-container' style={{ display: 'block' }}>
-                  {resultData.installmentOption}
-                </div>
-                <div id='note-container' style={{ display: 'block' }}>
-                  {resultData.note}
-                </div>
-              </>
-            )}
+            {(resultData || error) && (
+              <div className={styles['result-container']}>
+                {resultData && (
+                  <>
+                    <strong>{resultData.result}</strong>
+                    <div>{resultData.cashOption}</div>
+                    <div>{resultData.installmentOption}</div>
+                    <div className={styles['note-container']}>{resultData.note}</div>
+                  </>
+                )}
 
-            {error && (
-              <div id='result-container' style={{ display: 'grid' }}>
-                <strong>{error}</strong>
+                {error && <strong>{error}</strong>}
               </div>
             )}
           </div>
