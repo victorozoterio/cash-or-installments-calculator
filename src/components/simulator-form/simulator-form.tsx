@@ -1,48 +1,58 @@
 import styles from './simulator-form.module.css';
-import React, { useEffect, useState } from 'react';
+import React, { useEffect } from 'react';
+import { useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { simulatorSchema, SimulatorFormData } from './schema';
 import { getAnnualSelicRatePercent, getSimulatorResult } from '../../services';
 import * as T from '../../services/simulator/types';
+import { mask } from '../../utils';
+import { formatPercentageForDisplay, handleMaskedInput, MaskType } from './utils';
 
 export default function SimulatorForm() {
-  const [cashValue, setCashValue] = useState<number>(0);
-  const [installmentValue, setInstallmentValue] = useState<number>(0);
-  const [numberOfInstallments, setNumberOfInstallments] = useState<number>(0);
-  const [annualSelicRatePercent, setAnnualSelicRatePercent] = useState<number | string>('');
-  const [resultData, setResultData] = useState<T.SimulatorResponse | null>(null);
-  const [error, setError] = useState<string | null>(null);
+  const {
+    handleSubmit,
+    setValue,
+    watch,
+    formState: { errors },
+  } = useForm<SimulatorFormData>({
+    resolver: zodResolver(simulatorSchema),
+    defaultValues: {
+      cashValue: undefined,
+      installmentValue: undefined,
+      numberOfInstallments: 1,
+      annualSelicRatePercent: undefined,
+    },
+  });
+
+  const watchCashValue = watch('cashValue');
+  const watchInstallmentValue = watch('installmentValue');
+  const watchSelic = watch('annualSelicRatePercent');
+
+  const [resultData, setResultData] = React.useState<T.SimulatorResponse | null>(null);
 
   useEffect(() => {
     const fetchSelicRate = async () => {
       try {
         const rate = await getAnnualSelicRatePercent();
-        setAnnualSelicRatePercent(rate);
+        setValue('annualSelicRatePercent', rate);
       } catch (err) {
-        console.error('Error fetching Selic rate:', err);
+        console.error('Erro ao buscar taxa Selic:', err);
+        setValue('annualSelicRatePercent', 0);
       }
     };
-
     fetchSelicRate();
-  }, []);
+  }, [setValue]);
 
-  const handleSubmit = async (event: React.FormEvent) => {
-    event.preventDefault();
-
-    const data: T.SimulatorData = {
-      cashValue,
-      installmentValue,
-      numberOfInstallments,
-      annualSelicRatePercent: typeof annualSelicRatePercent === 'string' ? 0 : annualSelicRatePercent,
-    };
-
-    getSimulatorResult(data).then((result) => {
-      setResultData(result);
-      setError(null);
-    });
+  const onSubmit = async (data: SimulatorFormData) => {
+    const result = await getSimulatorResult(data);
+    setResultData(result);
   };
+
+  const disableScroll = (e: React.WheelEvent<HTMLInputElement>) => e.currentTarget.blur();
 
   return (
     <main>
-      <form onSubmit={handleSubmit}>
+      <form onSubmit={handleSubmit(onSubmit)}>
         <fieldset className={styles.simulator}>
           <h1>À vista ou parcelado?</h1>
 
@@ -53,28 +63,36 @@ export default function SimulatorForm() {
                 <div className={styles['input-box']}>
                   <div className={styles.prefix}>R$</div>
                   <input
-                    type='number'
+                    type='text'
                     id='installment-value'
-                    value={installmentValue}
-                    onChange={(e) => setInstallmentValue(Number(e.target.value))}
-                    placeholder='00,00'
+                    defaultValue={watchInstallmentValue ? mask.money(watchInstallmentValue) : ''}
+                    onChange={(e) =>
+                      handleMaskedInput<SimulatorFormData>(e, setValue, 'installmentValue', MaskType.MONEY)
+                    }
+                    placeholder='0,00'
                     required
                   />
                 </div>
+                {errors.installmentValue && <span className={styles.error}>{errors.installmentValue.message}</span>}
               </div>
 
               <div className={styles['input-wrapper']}>
                 <label htmlFor='number-of-installments'>Quant. de parcelas</label>
                 <div className={styles['input-box']}>
                   <input
-                    type='number'
+                    type='text'
                     id='number-of-installments'
-                    value={numberOfInstallments}
-                    onChange={(e) => setNumberOfInstallments(Number(e.target.value))}
-                    placeholder='0'
+                    onChange={(e) =>
+                      handleMaskedInput<SimulatorFormData>(e, setValue, 'numberOfInstallments', MaskType.INSTALLMENTS)
+                    }
+                    onWheel={disableScroll}
+                    placeholder='1'
                     required
                   />
                 </div>
+                {errors.numberOfInstallments && (
+                  <span className={styles.error}>{errors.numberOfInstallments.message}</span>
+                )}
               </div>
             </div>
 
@@ -84,46 +102,46 @@ export default function SimulatorForm() {
                 <div className={styles['input-box']}>
                   <div className={styles.prefix}>R$</div>
                   <input
-                    type='number'
+                    type='text'
                     id='cash-value'
-                    value={cashValue}
-                    onChange={(e) => setCashValue(Number(e.target.value))}
-                    placeholder='00,00'
+                    defaultValue={watchCashValue ? mask.money(watchCashValue) : ''}
+                    onChange={(e) => handleMaskedInput<SimulatorFormData>(e, setValue, 'cashValue', MaskType.MONEY)}
+                    placeholder='0,00'
                     required
                   />
                 </div>
+                {errors.cashValue && <span className={styles.error}>{errors.cashValue.message}</span>}
               </div>
 
               <div className={styles['input-wrapper']}>
                 <label htmlFor='annual-selic-rate'>Taxa de juros anual</label>
                 <div className={styles['input-box']}>
                   <input
-                    type='number'
+                    type='text'
                     id='annual-selic-rate'
-                    value={annualSelicRatePercent}
-                    onChange={(e) => setAnnualSelicRatePercent(e.target.value)}
-                    placeholder='0'
+                    defaultValue={formatPercentageForDisplay(watchSelic)}
+                    onChange={(e) =>
+                      handleMaskedInput<SimulatorFormData>(e, setValue, 'annualSelicRatePercent', MaskType.PERCENTAGE)
+                    }
+                    placeholder='0,00'
                     required
                   />
                   <div className={styles.suffix}>%</div>
                 </div>
+                {errors.annualSelicRatePercent && (
+                  <span className={styles.error}>{errors.annualSelicRatePercent.message}</span>
+                )}
               </div>
             </div>
 
             <button type='submit'>Simular</button>
 
-            {(resultData || error) && (
+            {resultData && (
               <div className={styles['result-container']}>
-                {resultData && (
-                  <>
-                    <strong>{resultData.result}</strong>
-                    <div>{resultData.cashOption}</div>
-                    <div>{resultData.installmentOption}</div>
-                    <div className={styles['note-container']}>{resultData.note}</div>
-                  </>
-                )}
-
-                {error && <strong>{error}</strong>}
+                <strong>{resultData.result}</strong>
+                <div>{resultData.cashOption}</div>
+                <div>{resultData.installmentOption}</div>
+                <div className={styles['note-container']}>{resultData.note}</div>
               </div>
             )}
           </div>
