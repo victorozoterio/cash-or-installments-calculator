@@ -35,30 +35,35 @@ body {
 .container {
   display: flex;
   flex-direction: column;
-  gap: 1.5rem;
+  gap: 1rem;
   width: 100%;
 }
 
 .row {
   display: grid;
   grid-template-columns: 1fr 8rem;
-  gap: 2rem;
+  gap: 1.5rem;
 }
 
 .input-wrapper {
   display: flex;
   flex-direction: column;
   gap: 0.25rem;
+  position: relative;
+  padding-bottom: 1rem;
 }
 
 .input-box {
   display: flex;
   align-items: center;
+  justify-content: space-between;
   border: 2px solid var(--border-color);
   border-radius: 0.5rem;
   overflow: hidden;
   background: var(--bg-simulator-color);
   transition: border-color 0.2s;
+  position: relative;
+  margin-bottom: 0.125rem;
 }
 
 .input-box:hover {
@@ -67,6 +72,16 @@ body {
 
 .input-box:focus-within {
   border-color: var(--border-color-focus);
+}
+
+.input-box.error {
+  border-color: var(--error-color);
+}
+
+.input-box input[type="number"]::-webkit-inner-spin-button,
+.input-box input[type="number"]::-webkit-outer-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
 }
 
 .prefix,
@@ -87,6 +102,10 @@ body {
 
 .suffix {
   border-left: 1px solid var(--border-color);
+  position: absolute;
+  right: 0;
+  top: 0;
+  bottom: 0;
 }
 
 .input-box input {
@@ -100,6 +119,21 @@ body {
 
 .input-box input::placeholder {
   color: var(--placeholder-color);
+}
+
+.error-container {
+  display: flex;
+  align-items: center;
+  gap: 0.3rem;
+  font-size: 0.85rem;
+  color: var(--error-color);
+  position: absolute;
+  bottom: 0;
+  left: 0;
+}
+
+.error-icon {
+  color: var(--error-color);
 }
 
 button {

@@ -7,6 +7,7 @@ import { getAnnualSelicRatePercent, getSimulatorResult } from '../../services';
 import * as T from '../../services/simulator/types';
 import { mask } from '../../utils';
 import { formatPercentageForDisplay, handleMaskedInput, MaskType } from './utils';
+import { AlertCircle } from 'lucide-react';
 
 export default function SimulatorForm() {
   const {
@@ -17,10 +18,10 @@ export default function SimulatorForm() {
   } = useForm<SimulatorFormData>({
     resolver: zodResolver(simulatorSchema),
     defaultValues: {
-      cashValue: undefined,
-      installmentValue: undefined,
-      numberOfInstallments: 1,
-      annualSelicRatePercent: undefined,
+      cashValue: 0,
+      installmentValue: 0,
+      numberOfInstallments: 0,
+      annualSelicRatePercent: 0,
     },
   });
 
@@ -60,7 +61,7 @@ export default function SimulatorForm() {
             <div className={styles.row}>
               <div className={styles['input-wrapper']}>
                 <label htmlFor='installment-value'>Valor da parcela</label>
-                <div className={styles['input-box']}>
+                <div className={`${styles['input-box']} ${errors.installmentValue ? styles.error : ''}`}>
                   <div className={styles.prefix}>R$</div>
                   <input
                     type='text'
@@ -70,15 +71,19 @@ export default function SimulatorForm() {
                       handleMaskedInput<SimulatorFormData>(e, setValue, 'installmentValue', MaskType.MONEY)
                     }
                     placeholder='0,00'
-                    required
                   />
                 </div>
-                {errors.installmentValue && <span className={styles.error}>{errors.installmentValue.message}</span>}
+                {errors.installmentValue && (
+                  <div className={styles['error-container']}>
+                    <AlertCircle size={16} className={styles['error-icon']} />
+                    <span>{errors.installmentValue.message}</span>
+                  </div>
+                )}
               </div>
 
               <div className={styles['input-wrapper']}>
                 <label htmlFor='number-of-installments'>Quant. de parcelas</label>
-                <div className={styles['input-box']}>
+                <div className={`${styles['input-box']} ${errors.numberOfInstallments ? styles.error : ''}`}>
                   <input
                     type='text'
                     id='number-of-installments'
@@ -87,11 +92,13 @@ export default function SimulatorForm() {
                     }
                     onWheel={disableScroll}
                     placeholder='1'
-                    required
                   />
                 </div>
                 {errors.numberOfInstallments && (
-                  <span className={styles.error}>{errors.numberOfInstallments.message}</span>
+                  <div className={styles['error-container']}>
+                    <AlertCircle size={16} className={styles['error-icon']} />
+                    <span>{errors.numberOfInstallments.message}</span>
+                  </div>
                 )}
               </div>
             </div>
@@ -99,7 +106,7 @@ export default function SimulatorForm() {
             <div className={styles.row}>
               <div className={styles['input-wrapper']}>
                 <label htmlFor='cash-value'>Valor à vista</label>
-                <div className={styles['input-box']}>
+                <div className={`${styles['input-box']} ${errors.cashValue ? styles.error : ''}`}>
                   <div className={styles.prefix}>R$</div>
                   <input
                     type='text'
@@ -107,29 +114,36 @@ export default function SimulatorForm() {
                     defaultValue={watchCashValue ? mask.money(watchCashValue) : ''}
                     onChange={(e) => handleMaskedInput<SimulatorFormData>(e, setValue, 'cashValue', MaskType.MONEY)}
                     placeholder='0,00'
-                    required
                   />
                 </div>
-                {errors.cashValue && <span className={styles.error}>{errors.cashValue.message}</span>}
+                {errors.cashValue && (
+                  <div className={styles['error-container']}>
+                    <AlertCircle size={16} className={styles['error-icon']} />
+                    <span>{errors.cashValue.message}</span>
+                  </div>
+                )}
               </div>
 
               <div className={styles['input-wrapper']}>
                 <label htmlFor='annual-selic-rate'>Taxa de juros anual</label>
-                <div className={styles['input-box']}>
+                <div className={`${styles['input-box']} ${errors.annualSelicRatePercent ? styles.error : ''}`}>
                   <input
                     type='text'
                     id='annual-selic-rate'
-                    defaultValue={formatPercentageForDisplay(watchSelic)}
+                    value={formatPercentageForDisplay(watchSelic)}
                     onChange={(e) =>
                       handleMaskedInput<SimulatorFormData>(e, setValue, 'annualSelicRatePercent', MaskType.PERCENTAGE)
                     }
                     placeholder='0,00'
-                    required
                   />
+
                   <div className={styles.suffix}>%</div>
                 </div>
                 {errors.annualSelicRatePercent && (
-                  <span className={styles.error}>{errors.annualSelicRatePercent.message}</span>
+                  <div className={styles['error-container']}>
+                    <AlertCircle size={16} className={styles['error-icon']} />
+                    <span>{errors.annualSelicRatePercent.message}</span>
+                  </div>
                 )}
               </div>
             </div>

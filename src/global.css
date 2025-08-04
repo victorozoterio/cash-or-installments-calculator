@@ -24,7 +24,9 @@
   --btn-color: #00a13f;
   --btn-color-hover: #008b36;
 
-  --placeholder-color: #aaa;
+  --placeholder-color: #aaaaaa;
+
+  --error-color: #ff6b6b;
 }
 
 body {
